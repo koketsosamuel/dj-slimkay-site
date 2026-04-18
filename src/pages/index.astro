@@ -822,8 +822,9 @@ const title = 'SLIMKAY — house, techno & everything in between';
       <h4>Follow</h4>
       <ul>
         <li><a href="https://www.youtube.com/@RealSlimkay" target="_blank" rel="noopener" data-hot>YouTube</a></li>
-        <li><a href="#" data-hot>Instagram</a></li>
-        <li><a href="#" data-hot>Resident Advisor</a></li>
+        <li><a href="https://www.instagram.com/real_slimkay" target="_blank" rel="noopener" data-hot>Instagram</a></li>
+        <li><a href="https://www.facebook.com/share/1BqmLKWvmb/?mibextid=wwXIfr" target="_blank" rel="noopener" data-hot>Facebook</a></li>
+        <li><a href="https://www.tiktok.com/@real_slimkay?_r=1&amp;_t=ZS-95dTMCIQhN7" target="_blank" rel="noopener" data-hot>TikTok</a></li>
       </ul>
     </div>
     <div class="footer-col">
@@ -966,6 +967,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
     if (keep !== singleAudio && !singleAudio.paused) singleAudio.pause();
     if (keep !== mixAudio && !mixAudio.paused) mixAudio.pause();
   };
+  const playExclusive = (audio) => { stopOther(audio); return audio.play(); };
 
   singleAudio.addEventListener('loadedmetadata', () => { durEl.textContent = fmt(singleAudio.duration); });
   const wavePos = document.getElementById('wavePos');
@@ -999,7 +1001,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
   });
 
   playerPlay.addEventListener('click', () => {
-    if (singleAudio.paused) singleAudio.play(); else singleAudio.pause();
+    if (singleAudio.paused) playExclusive(singleAudio); else singleAudio.pause();
   });
 
   const waveEl = document.getElementById('wave');
@@ -1044,7 +1046,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
   const mixFill = document.getElementById('mixFill');
   const mixKnob = document.getElementById('mixKnob');
   const mixVol = document.getElementById('mixVol');
-  const toggleMix = () => { if (mixAudio.paused) mixAudio.play(); else mixAudio.pause(); };
+  const toggleMix = () => { if (mixAudio.paused) playExclusive(mixAudio); else mixAudio.pause(); };
   mixPlayBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMix(); });
   mixCtrlPlay.addEventListener('click', (e) => { e.stopPropagation(); toggleMix(); });
   mixItem.addEventListener('click', (e) => {
@@ -1079,7 +1081,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
   mixVol.addEventListener('click', (e) => e.stopPropagation());
 
   playFab.addEventListener('click', () => {
-    if (singleAudio.paused && mixAudio.paused) singleAudio.play();
+    if (singleAudio.paused && mixAudio.paused) playExclusive(singleAudio);
     else { singleAudio.pause(); mixAudio.pause(); }
   });
 
