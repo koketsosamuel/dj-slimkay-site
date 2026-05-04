@@ -229,6 +229,9 @@ const title = 'SLIMKAY — house, techno & everything in between';
   .btn .arr{display:inline-block;transition:transform .3s}
   .btn:hover .arr{transform:translateX(4px)}
   .btn svg{width:12px;height:12px}
+  .btn:disabled{cursor:not-allowed;opacity:.6}
+  .btn:disabled::before{transform:translateY(100%)}
+  .btn:disabled .arr{transform:none}
 
   .hero-spectrum{
     position:absolute;left:20px;right:20px;bottom:60px;
@@ -756,10 +759,10 @@ const title = 'SLIMKAY — house, techno & everything in between';
       </div>
     </div>
 
-    <form class="reveal" id="bookForm">
+    <form class="reveal" id="bookForm" novalidate>
       <div class="rows-2">
-        <div class="row"><label>Full name</label><input required name="name" placeholder="e.g. Thabo Mokoena"></div>
-        <div class="row"><label>Email</label><input required type="email" name="email" placeholder="name@example.com"></div>
+        <div class="row"><label>Full name</label><input name="name" placeholder="e.g. Thabo Mokoena"></div>
+        <div class="row"><label>Email</label><input type="email" name="email" placeholder="name@example.com"></div>
       </div>
       <div class="rows-2">
         <div class="row"><label>Phone / WhatsApp</label><input name="phone" type="tel" placeholder="e.g. 082 123 4567" inputmode="tel"></div>
@@ -767,7 +770,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
       </div>
       <div class="rows-2">
         <div class="row"><label>Event type</label>
-          <select name="type" required>
+          <select name="type">
             <option value="" disabled selected>Pick an event type</option>
             <option>Wedding</option>
             <option>Corporate function</option>
@@ -804,7 +807,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
       </div>
       <div class="row"><label>Details</label><textarea name="notes" placeholder="Slot time, crowd vibe, budget range, other acts on the bill, anything else we should know…"></textarea></div>
       <button class="btn primary submit" type="submit" data-hot><span>Send enquiry</span><span class="arr">→</span></button>
-      <div id="formResp" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--red-hot);text-transform:uppercase;margin-top:4px;display:none">★ Sent — reply within 48h</div>
+      <div id="formResp" role="status" aria-live="polite" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--red-hot);text-transform:uppercase;margin-top:4px;display:none">Sent - reply within 48h</div>
     </form>
   </div>
 </section>
@@ -1094,9 +1097,101 @@ const title = 'SLIMKAY — house, techno & everything in between';
     else { singleAudio.pause(); mixAudio.pause(); }
   });
 
-  document.getElementById('bookForm').addEventListener('submit', e => {
+  const bookForm = document.getElementById('bookForm');
+  const formResp = document.getElementById('formResp');
+  const submitBtn = bookForm.querySelector('button[type="submit"]');
+  const submitLabel = submitBtn.querySelector('span');
+  const contactEndpoint = 'https://general-api.brightsync.co.za/api/contact-submissions';
+
+  const setFormMessage = (message, ok = false) => {
+    formResp.textContent = message;
+    formResp.style.color = ok ? 'var(--ink)' : 'var(--red-hot)';
+    formResp.style.display = 'block';
+  };
+
+  const getValue = (data, key) => (data.get(key) || '').toString().trim();
+
+  const composeBookingMessage = (values) => {
+    const bookingDetails = [
+      ['Event date', values.date],
+      ['Event type', values.type],
+      ['Expected guests', values.guests],
+      ['Venue / city', values.venue],
+      ['Set length', values.duration],
+    ]
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`);
+
+    return [
+      values.notes,
+      bookingDetails.length ? `Booking details:\n${bookingDetails.join('\n')}` : '',
+    ]
+      .filter(Boolean)
+      .join('\n\n');
+  };
+
+  bookForm.addEventListener('submit', async e => {
     e.preventDefault();
-    document.getElementById('formResp').style.display = 'block';
+    const data = new FormData(bookForm);
+    const values = {
+      name: getValue(data, 'name'),
+      email: getValue(data, 'email'),
+      phone: getValue(data, 'phone'),
+      date: getValue(data, 'date'),
+      type: getValue(data, 'type'),
+      guests: getValue(data, 'guests'),
+      venue: getValue(data, 'venue'),
+      duration: getValue(data, 'duration'),
+      notes: getValue(data, 'notes'),
+    };
+    const message = composeBookingMessage(values);
+
+    if (!values.name && !values.email && !values.phone) {
+      setFormMessage('Add your name, email, or phone so we can reply.');
+      bookForm.elements.name.focus();
+      return;
+    }
+
+    if (values.email && !bookForm.elements.email.validity.valid) {
+      setFormMessage('Enter a valid email address, or leave email blank.');
+      bookForm.elements.email.focus();
+      return;
+    }
+
+    if (!message) {
+      setFormMessage('Add booking details or a message before sending.');
+      bookForm.elements.notes.focus();
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitLabel.textContent = 'Sending';
+    setFormMessage('Sending enquiry...');
+
+    try {
+      const response = await fetch(contactEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Subject: 'Website enquiry',
+          name: values.name,
+          phone: values.phone,
+          email: values.email,
+          message,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Submission failed with status ${response.status}`);
+
+      bookForm.reset();
+      setFormMessage('Sent - reply within 48h', true);
+    } catch (error) {
+      setFormMessage('Could not send. Please try again or WhatsApp Slimkay.');
+      console.error(error);
+    } finally {
+      submitBtn.disabled = false;
+      submitLabel.textContent = 'Send enquiry';
+    }
   });
 
   const io = new IntersectionObserver(entries => {
