@@ -2,6 +2,16 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dj-slimkay-site",
   "compatibility_date": "2025-04-01",
+  "routes": [
+    {
+      "pattern": "slimkay.co.za",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.slimkay.co.za",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page"

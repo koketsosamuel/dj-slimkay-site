@@ -12,7 +12,8 @@
     "deploy": "astro build && wrangler deploy"
   },
   "dependencies": {
-    "astro": "^5.1.0"
+    "@astrojs/sitemap": "^3.7.2",
+    "astro": "^6.3.1"
   },
   "devDependencies": {
     "wrangler": "^4.84.1"

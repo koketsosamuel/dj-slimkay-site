@@ -1,5 +1,10 @@
 ---
 const title = 'SLIMKAY — house, techno & everything in between';
+const description = 'Book Slimkay, a Soshanguve and Pretoria DJ blending Sgidongo energy with deep house groove for clubs, festivals, pubs, private events, and brand activations.';
+const siteUrl = 'https://slimkay.co.za';
+const canonicalUrl = `${siteUrl}/`;
+const socialImage = `${siteUrl}/assets/slimkay-hero.jpg`;
+const isProduction = import.meta.env.PROD;
 ---
 <!doctype html>
 <html lang="en">
@@ -7,8 +12,29 @@ const title = 'SLIMKAY — house, techno & everything in between';
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonicalUrl} />
+<meta name="theme-color" content="#080304" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Slimkay" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={socialImage} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={socialImage} />
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+{isProduction && (
+  <>
+    <link rel="preconnect" href="https://umami.brightsync.co.za" />
+    <link rel="dns-prefetch" href="https://umami.brightsync.co.za" />
+    <script is:inline defer src="https://umami.brightsync.co.za/script.js" data-website-id="ca25350c-cb05-4581-9548-1b3db8e4e98b"></script>
+  </>
+)}
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;900&family=Archivo+Black&family=JetBrains+Mono:wght@400;500;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -761,16 +787,16 @@ const title = 'SLIMKAY — house, techno & everything in between';
 
     <form class="reveal" id="bookForm" novalidate>
       <div class="rows-2">
-        <div class="row"><label>Full name</label><input name="name" placeholder="e.g. Thabo Mokoena"></div>
-        <div class="row"><label>Email</label><input type="email" name="email" placeholder="name@example.com"></div>
+        <div class="row"><label for="bookingName">Full name</label><input id="bookingName" name="name" placeholder="e.g. Thabo Mokoena"></div>
+        <div class="row"><label for="bookingEmail">Email</label><input id="bookingEmail" type="email" name="email" placeholder="name@example.com"></div>
       </div>
       <div class="rows-2">
-        <div class="row"><label>Phone / WhatsApp</label><input name="phone" type="tel" placeholder="e.g. 082 123 4567" inputmode="tel"></div>
-        <div class="row"><label>Event date</label><input type="date" name="date"></div>
+        <div class="row"><label for="bookingPhone">Phone / WhatsApp</label><input id="bookingPhone" name="phone" type="tel" placeholder="e.g. 082 123 4567" inputmode="tel"></div>
+        <div class="row"><label for="bookingDate">Event date</label><input id="bookingDate" type="date" name="date"></div>
       </div>
       <div class="rows-2">
-        <div class="row"><label>Event type</label>
-          <select name="type">
+        <div class="row"><label for="bookingType">Event type</label>
+          <select id="bookingType" name="type">
             <option value="" disabled selected>Pick an event type</option>
             <option>Wedding</option>
             <option>Corporate function</option>
@@ -783,8 +809,8 @@ const title = 'SLIMKAY — house, techno & everything in between';
             <option>Other</option>
           </select>
         </div>
-        <div class="row"><label>Expected guests</label>
-          <select name="guests">
+        <div class="row"><label for="bookingGuests">Expected guests</label>
+          <select id="bookingGuests" name="guests">
             <option value="" disabled selected>How many people?</option>
             <option>Under 50</option>
             <option>50 – 150</option>
@@ -794,9 +820,9 @@ const title = 'SLIMKAY — house, techno & everything in between';
           </select>
         </div>
       </div>
-      <div class="row"><label>Venue / city</label><input name="venue" placeholder="e.g. Marks Pub &amp; Shisanyama, Soshanguve"></div>
-      <div class="row"><label>Set length</label>
-        <select name="duration">
+      <div class="row"><label for="bookingVenue">Venue / city</label><input id="bookingVenue" name="venue" placeholder="e.g. Marks Pub &amp; Shisanyama, Soshanguve"></div>
+      <div class="row"><label for="bookingDuration">Set length</label>
+        <select id="bookingDuration" name="duration">
           <option value="" disabled selected>How long would I be playing?</option>
           <option>1 hour</option>
           <option>2 hours</option>
@@ -805,7 +831,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
           <option>Not sure yet</option>
         </select>
       </div>
-      <div class="row"><label>Details</label><textarea name="notes" placeholder="Slot time, crowd vibe, budget range, other acts on the bill, anything else we should know…"></textarea></div>
+      <div class="row"><label for="bookingNotes">Details</label><textarea id="bookingNotes" name="notes" placeholder="Slot time, crowd vibe, budget range, other acts on the bill, anything else we should know…"></textarea></div>
       <button class="btn primary submit" type="submit" data-hot><span>Send enquiry</span><span class="arr">→</span></button>
       <div id="formResp" role="status" aria-live="polite" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:var(--red-hot);text-transform:uppercase;margin-top:4px;display:none">Sent - reply within 48h</div>
     </form>
@@ -846,9 +872,17 @@ const title = 'SLIMKAY — house, techno & everything in between';
         <li><a href="tel:+27659650669" data-hot>065 965 0669</a></li>
       </ul>
     </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <ul>
+        <li><a href="/privacy-policy/" data-hot>Privacy Policy</a></li>
+        <li><a href="/cookie-policy/" data-hot>Cookie Policy</a></li>
+        <li><a href="/terms-and-conditions/" data-hot>Terms</a></li>
+      </ul>
+    </div>
   </div>
   <div class="footer-bottom">
-    <div>© 2026 Slimkay · Soshanguve · Pretoria</div>
+    <div>© 2026 Slimkay · slimkay.co.za</div>
     <div>Rhythm · Passion · Unity</div>
   </div>
 </footer>
@@ -1101,7 +1135,7 @@ const title = 'SLIMKAY — house, techno & everything in between';
   const formResp = document.getElementById('formResp');
   const submitBtn = bookForm.querySelector('button[type="submit"]');
   const submitLabel = submitBtn.querySelector('span');
-  const contactEndpoint = 'https://general-api.brightsync.co.za/api/contact-submissions';
+  const contactEndpoint = 'https://hub.brightsync.co.za/api/contact-submissions';
 
   const setFormMessage = (message, ok = false) => {
     formResp.textContent = message;
